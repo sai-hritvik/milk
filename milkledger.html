@@ -11,6 +11,7 @@
   th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
   input { width: 80px; }
   button { margin-top: 10px; padding: 10px; width: 100%; }
+  #clearBtn { background-color: #f44336; color: white; margin-top: 20px; }
 </style>
 </head>
 <body>
@@ -22,6 +23,7 @@
 <label>Price per Liter: <input type="number" id="price" min="0" step="0.1"></label><br><br>
 
 <button onclick="addRecord()">Add Record</button>
+<button id="clearBtn" onclick="clearHistory()">Clear History</button>
 
 <h2>Monthly Records</h2>
 <table>
@@ -43,18 +45,16 @@
 </table>
 
 <script>
-  // Get today's date in yyyy-mm-dd format
   function getTodayDate() {
     const d = new Date();
     return d.toISOString().split('T')[0];
   }
 
-  // Load saved records from localStorage or add default past entry
+  // Load saved records or add default entry
   let records = JSON.parse(localStorage.getItem('milkRecords')) || [
-    { date: getTodayDate(), liters: 1, price: 50 } // default entry
+    { date: getTodayDate(), liters: 1, price: 50 }
   ];
 
-  // Auto-fill date input with today
   document.getElementById('date').value = getTodayDate();
 
   function updateTable() {
@@ -88,7 +88,6 @@
       return;
     }
 
-    // Check if record for this date exists, update it
     const existingIndex = records.findIndex(r => r.date === date);
     if (existingIndex >= 0) {
       records[existingIndex] = { date, liters, price };
@@ -99,10 +98,17 @@
     localStorage.setItem('milkRecords', JSON.stringify(records));
     updateTable();
 
-    // Clear liters and price inputs, reset date to today
     document.getElementById('liters').value = '';
     document.getElementById('price').value = '';
     document.getElementById('date').value = getTodayDate();
+  }
+
+  function clearHistory() {
+    if (confirm('Are you sure you want to clear all records?')) {
+      records = [];
+      localStorage.removeItem('milkRecords');
+      updateTable();
+    }
   }
 
   updateTable(); // initial load

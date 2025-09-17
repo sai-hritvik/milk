@@ -43,17 +43,19 @@
 </table>
 
 <script>
-  // Function to get yesterday's date in yyyy-mm-dd format
-  function getYesterdayDate() {
+  // Get today's date in yyyy-mm-dd format
+  function getTodayDate() {
     const d = new Date();
-    d.setDate(d.getDate() - 1);
     return d.toISOString().split('T')[0];
   }
 
-  // Load saved records from localStorage
+  // Load saved records from localStorage or add default past entry
   let records = JSON.parse(localStorage.getItem('milkRecords')) || [
-    { date: getYesterdayDate(), liters: 1, price: 50 } // default past entry
+    { date: getTodayDate(), liters: 1, price: 50 } // default entry
   ];
+
+  // Auto-fill date input with today
+  document.getElementById('date').value = getTodayDate();
 
   function updateTable() {
     const table = document.getElementById('recordTable');
@@ -97,9 +99,10 @@
     localStorage.setItem('milkRecords', JSON.stringify(records));
     updateTable();
 
-    // Clear inputs
+    // Clear liters and price inputs, reset date to today
     document.getElementById('liters').value = '';
     document.getElementById('price').value = '';
+    document.getElementById('date').value = getTodayDate();
   }
 
   updateTable(); // initial load

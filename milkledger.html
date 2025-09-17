@@ -11,7 +11,8 @@
   th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
   input { width: 80px; }
   button { margin-top: 10px; padding: 10px; width: 100%; }
-  #clearBtn { background-color: #f44336; color: white; margin-top: 20px; }
+  #clearBtn { background-color: #f44336; color: white; margin-top: 10px; }
+  .deleteBtn { background-color: #e53935; color: white; padding: 4px 8px; border: none; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -33,6 +34,7 @@
       <th>Liters</th>
       <th>Price/Liter</th>
       <th>Total Amount</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody id="recordTable"></tbody>
@@ -40,6 +42,7 @@
     <tr>
       <td colspan="3"><strong>Monthly Total</strong></td>
       <td id="monthlyTotal">0</td>
+      <td></td>
     </tr>
   </tfoot>
 </table>
@@ -50,11 +53,10 @@
     return d.toISOString().split('T')[0];
   }
 
-  // Load saved records or add default entry
-  let records = JSON.parse(localStorage.getItem('milkRecords')) || [
-    { date: getTodayDate(), liters: 1, price: 50 }
-  ];
+  // Load saved records from localStorage, start empty if none
+  let records = JSON.parse(localStorage.getItem('milkRecords')) || [];
 
+  // Auto-fill date input with today
   document.getElementById('date').value = getTodayDate();
 
   function updateTable() {
@@ -62,7 +64,7 @@
     table.innerHTML = '';
     let total = 0;
 
-    records.forEach(r => {
+    records.forEach((r, index) => {
       const row = document.createElement('tr');
       const dailyTotal = r.liters * r.price;
       row.innerHTML = `
@@ -70,6 +72,7 @@
         <td>${r.liters}</td>
         <td>${r.price}</td>
         <td>${dailyTotal.toFixed(2)}</td>
+        <td><button class="deleteBtn" onclick="deleteRecord(${index})">Delete</button></td>
       `;
       table.appendChild(row);
       total += dailyTotal;
@@ -101,6 +104,14 @@
     document.getElementById('liters').value = '';
     document.getElementById('price').value = '';
     document.getElementById('date').value = getTodayDate();
+  }
+
+  function deleteRecord(index) {
+    if (confirm('Delete this record?')) {
+      records.splice(index, 1);
+      localStorage.setItem('milkRecords', JSON.stringify(records));
+      updateTable();
+    }
   }
 
   function clearHistory() {

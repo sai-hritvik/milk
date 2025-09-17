@@ -20,7 +20,6 @@
 <label>Date: <input type="date" id="date"></label><br><br>
 <label>Liters: <input type="number" id="liters" min="0" step="0.1"></label><br><br>
 <label>Price per Liter: <input type="number" id="price" min="0" step="0.1"></label><br><br>
-<label>Amount Paid: <input type="number" id="paid" min="0" step="0.1"></label><br><br>
 
 <button onclick="addRecord()">Add Record</button>
 
@@ -31,8 +30,7 @@
       <th>Date</th>
       <th>Liters</th>
       <th>Price/Liter</th>
-      <th>Total</th>
-      <th>Paid</th>
+      <th>Total Amount</th>
     </tr>
   </thead>
   <tbody id="recordTable"></tbody>
@@ -40,7 +38,6 @@
     <tr>
       <td colspan="3"><strong>Monthly Total</strong></td>
       <td id="monthlyTotal">0</td>
-      <td id="monthlyPaid">0</td>
     </tr>
   </tfoot>
 </table>
@@ -52,7 +49,7 @@
   function updateTable() {
     const table = document.getElementById('recordTable');
     table.innerHTML = '';
-    let total = 0, paidTotal = 0;
+    let total = 0;
 
     records.forEach(r => {
       const row = document.createElement('tr');
@@ -62,24 +59,20 @@
         <td>${r.liters}</td>
         <td>${r.price}</td>
         <td>${dailyTotal.toFixed(2)}</td>
-        <td>${r.paid}</td>
       `;
       table.appendChild(row);
       total += dailyTotal;
-      paidTotal += r.paid;
     });
 
     document.getElementById('monthlyTotal').innerText = total.toFixed(2);
-    document.getElementById('monthlyPaid').innerText = paidTotal.toFixed(2);
   }
 
   function addRecord() {
     const date = document.getElementById('date').value;
     const liters = parseFloat(document.getElementById('liters').value);
     const price = parseFloat(document.getElementById('price').value);
-    const paid = parseFloat(document.getElementById('paid').value);
 
-    if (!date || isNaN(liters) || isNaN(price) || isNaN(paid)) {
+    if (!date || isNaN(liters) || isNaN(price)) {
       alert('Please fill all fields!');
       return;
     }
@@ -87,9 +80,9 @@
     // Check if record for this date exists, update it
     const existingIndex = records.findIndex(r => r.date === date);
     if (existingIndex >= 0) {
-      records[existingIndex] = { date, liters, price, paid };
+      records[existingIndex] = { date, liters, price };
     } else {
-      records.push({ date, liters, price, paid });
+      records.push({ date, liters, price });
     }
 
     localStorage.setItem('milkRecords', JSON.stringify(records));
@@ -98,7 +91,6 @@
     // Clear inputs
     document.getElementById('liters').value = '';
     document.getElementById('price').value = '';
-    document.getElementById('paid').value = '';
   }
 
   updateTable(); // initial load
